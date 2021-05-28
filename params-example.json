@@ -1,0 +1,19 @@
+[
+	{
+		"name": "example-service-name",
+		"dev": [
+			{	"Name": "example-name",
+				"Value": "example",
+				"DataType": "text", "Overwrite": true,
+				"Tier": "Standard", "Type": "String"
+			},
+			{	"Name": "example-name-secure",
+				"Value": "example-secure-string",
+				"DataType": "text", "Overwrite": true,
+				"Tier": "Standard", "Type": "SecureString"
+			}
+		],
+		"stage": [],
+		"prod": []
+	}
+]
