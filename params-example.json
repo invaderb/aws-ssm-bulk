@@ -15,5 +15,28 @@
 		],
 		"stage": [],
 		"prod": []
+	},
+	{
+		"name": "example-service-name-2",
+		"dev": [
+			{	"Name": "example-name",
+				"Value": "example",
+				"DataType": "text", "Overwrite": true,
+				"Tier": "Standard", "Type": "String"
+			},
+			{	"Name": "example-name-secure",
+				"Value": "example-secure-string",
+				"DataType": "text", "Overwrite": true,
+				"Tier": "Standard", "Type": "SecureString"
+			}
+		],
+		"stage": [
+			{	"Name": "example-name",
+				"Value": "example",
+				"DataType": "text", "Overwrite": true,
+				"Tier": "Standard", "Type": "String"
+			}
+		],
+		"prod": []
 	}
 ]
