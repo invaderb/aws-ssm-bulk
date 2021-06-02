@@ -5,7 +5,16 @@ AWS.config.update({region: 'us-east-1'});
 const ssm = new AWS.SSM();
 const obj = require("./params.json");
 const args = require('yargs/yargs')(process.argv.slice(2))
-.array('name').array('stage').argv;
+.option('n', {
+	alias: 'name',
+	describe: 'Names of configurations to deploy',
+	type: 'array'
+})
+.option('s', {
+	alias: 'stage',
+	describe: 'stages of selected configurations to deploy',
+	type: 'array'
+}).argv;
 
 const prepDeploy = (names, stages) => {
 	let results = [];
@@ -17,49 +26,52 @@ const prepDeploy = (names, stages) => {
 }
 
 const filterObject = (names, stages) => {
-	let parent = [];
-	if (!names) {parent = obj}
+	let tempArray = [];
+	let returnArray = []
 	// filter the names
-	names.forEach(x => {
+	!names ? tempArray = obj : names.forEach(x => {
 		const params = obj.filter(param => param.name === x);
 		if(!params.length) {
-			console.warn('No params found by name:', x);
+			console.warn('No names found by:', x);
 			return;
 		};
-		parent.push(params[0])
+		tempArray.push(params[0])
 	});
-	let arr = []
 	if(!stages){
 		// build array of params
-		parent.forEach(y => {
+		tempArray.forEach(y => {
 			for (const key in y) {
 				if(Array.isArray(y[key])) {
-					arr = arr.concat(y[key]);
+					returnArray = returnArray.concat(y[key]);
 				}
 			}
+		}); 
+		return returnArray;
+	} else {
+		//filter the stages
+		stages.forEach(x => {
+			tempArray.forEach(y => {
+				if(y[x] === undefined || !y[x].length) {
+					console.warn('No stages found by:', x)
+					return;
+				}
+				returnArray = returnArray.concat(y[x]);
+			})
 		});
-		return arr;
+		return returnArray;
 	}
-	//filter the stages
-	stages.forEach(x => {
-		parent.forEach(y => {
-			if(y[x] === undefined || !y[x].length) {
-				console.warn('No prams found by stage: ', x)
-				return;
-			}
-			arr = arr.concat(y[x]);
-		})
-	});
-	return arr;
+	
 }
 
 async function doAllSequentually(arrFnPromiseList) {
-	if(!arrFnPromiseList || !Array.isArray(arrFnPromiseList)) { 
+	if(!arrFnPromiseList || !Array.isArray(arrFnPromiseList) || !arrFnPromiseList.length) { 
 		spinner.fail();
-		console.warn('Promise list doesnt exist or isnt an array.')
-		return; 
+		console.warn('Promise list doesnt exist or isnt an array. please check your json config file and ensure it is valid')
+		return;
 	}
 	arrFnPromiseList.forEach(async (x)=> {await x.promise();});
 }
 
-doAllSequentually(prepDeploy(args.name, args.stage)).catch(err => { console.warn(err)}).then(() => spinner.succeed());
+doAllSequentually(prepDeploy(args.name, args.stage))
+	.catch(console.warn)
+	.then(() => spinner.succeed());
