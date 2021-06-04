@@ -29,14 +29,18 @@ const filterObject = (names, stages) => {
 	let tempArray = [];
 	let returnArray = []
 	// filter the names
-	!names ? tempArray = obj : names.forEach(x => {
-		const params = obj.filter(param => param.name === x);
-		if(!params.length) {
-			console.warn('No names found by:', x);
-			return;
-		};
-		tempArray.push(params[0])
-	});
+	if(!names) {
+		tempArray = obj
+	} else {
+		names.forEach(x => {
+			const params = obj.filter(param => param.name === x);
+			if(!params.length) {
+				console.warn(`No names found by: ${x}`);
+				return;
+			};
+			tempArray.push(params[0])
+		});
+	}
 	if(!stages){
 		// build array of params
 		tempArray.forEach(y => {
@@ -52,7 +56,7 @@ const filterObject = (names, stages) => {
 		stages.forEach(x => {
 			tempArray.forEach(y => {
 				if(y[x] === undefined || !y[x].length) {
-					console.warn('No stages found by:', x)
+					console.warn(`No stages found by: ${x}`)
 					return;
 				}
 				returnArray = returnArray.concat(y[x]);
