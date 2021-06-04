@@ -20,7 +20,7 @@ Take a look at the params-example.json for a super simple example, rename it to 
 run the script
 
 ```
-node index.js --name {name 1} --name {name 2} --stage {stage 1} --stage {stage 2} --stage {stage 3}
+node index.js --name {name 1} {name 2} --stage {stage 1} {stage 2} {stage 3}
 ```
 
 You can pass in the individual names and environments you want to create or don't pass anything and it will try to deploy all of them.
@@ -58,5 +58,6 @@ You can pass in the individual names and environments you want to create or don'
 ```
 
 ## TODO
-- refactor to remove duplicate code
+- define aws config
+- define path to params file
 - unit test
