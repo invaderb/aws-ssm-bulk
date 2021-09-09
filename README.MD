@@ -15,15 +15,17 @@ install the dependencies
 npm ci
 ```
 
-Take a look at the params-example.json for a super simple example, rename it to params.json and add what ever you are trying to add.
+Take a look at the params-example.json for a super simple example, add what ever you are trying to add.
 
 run the script
 
 ```
-node index.js --name {name 1} {name 2} --stage {stage 1} {stage 2} {stage 3}
+node index.js --name {name 1} {name 2} --stage {stage 1} {stage 2} {stage 3} --path ./params-example.json
 ```
 
 You can pass in the individual names and environments you want to create or don't pass anything and it will try to deploy all of them.
+
+note path is a requirment.
 
 ### example config
 ```

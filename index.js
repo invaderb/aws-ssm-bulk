@@ -3,7 +3,7 @@ const spinner = ora('Loading Params').start();
 const AWS = require("aws-sdk");
 AWS.config.update({region: 'us-east-1'});
 const ssm = new AWS.SSM();
-const obj = require("./params.json");
+const fs = require('fs');
 const args = require('yargs/yargs')(process.argv.slice(2))
 .option('n', {
 	alias: 'name',
@@ -14,18 +14,36 @@ const args = require('yargs/yargs')(process.argv.slice(2))
 	alias: 'stage',
 	describe: 'stages of selected configurations to deploy',
 	type: 'array'
-}).argv;
+})
+.option('p', {
+	alias: 'path',
+	describe: 'path to json params',
+	type: 'string'
+}).demandOption(
+	['path'], 
+	'Please provide path argument to work with this tool'
+).argv;
 
-const prepDeploy = (names, stages) => {
+const prepDeploy = (names, stages, path) => {
+	let obj;
+	try {
+		if (fs.existsSync(path)) {
+		  //file exists
+		  obj = JSON.parse(fs.readFileSync(path));
+		}
+	} catch(err) {
+		console.error(err);
+		return err;
+	}
 	let results = [];
-	let params = filterObject(names, stages);
+	let params = filterObject(names, stages, obj);
 	params.forEach(x => {
 		results.push(ssm.putParameter(x));
 	});
 	return results;
 }
 
-const filterObject = (names, stages) => {
+const filterObject = (names, stages, obj) => {
 	let tempArray = [];
 	let returnArray = []
 	// filter the names
@@ -70,12 +88,12 @@ const filterObject = (names, stages) => {
 async function doAllSequentually(arrFnPromiseList) {
 	if(!arrFnPromiseList || !Array.isArray(arrFnPromiseList) || !arrFnPromiseList.length) { 
 		spinner.fail();
-		console.warn('Promise list doesnt exist or isnt an array. please check your json config file and ensure it is valid')
+		console.error('Promise list doesnt exist or isnt an array. please check your json config file and ensure it is valid')
 		return;
 	}
 	arrFnPromiseList.forEach(async (x)=> {await x.promise();});
 }
 
-doAllSequentually(prepDeploy(args.name, args.stage))
-	.catch(console.warn)
+doAllSequentually(prepDeploy(args.name, args.stage, args.path))
+	.catch(console.error)
 	.then(() => spinner.succeed());
