@@ -20,7 +20,7 @@ const args = require('yargs/yargs')(process.argv.slice(2))
 	describe: 'path to json params',
 	type: 'string'
 }).demandOption(
-	['path'], 
+	['path'],
 	'Please provide path argument to work with this tool'
 ).argv;
 
@@ -67,7 +67,7 @@ const filterObject = (names, stages, obj) => {
 					returnArray = returnArray.concat(y[key]);
 				}
 			}
-		}); 
+		});
 		return returnArray;
 	} else {
 		//filter the stages
@@ -82,16 +82,18 @@ const filterObject = (names, stages, obj) => {
 		});
 		return returnArray;
 	}
-	
+
 }
 
 async function doAllSequentually(arrFnPromiseList) {
-	if(!arrFnPromiseList || !Array.isArray(arrFnPromiseList) || !arrFnPromiseList.length) { 
+	if(!arrFnPromiseList || !Array.isArray(arrFnPromiseList) || !arrFnPromiseList.length) {
 		spinner.fail();
 		console.error('Promise list doesnt exist or isnt an array. please check your json config file and ensure it is valid')
 		return;
 	}
-	arrFnPromiseList.forEach(async (x)=> {await x.promise();});
+	for (const x of arrFnPromiseList) {
+		await x.promise();
+	}
 }
 
 doAllSequentually(prepDeploy(args.name, args.stage, args.path))
